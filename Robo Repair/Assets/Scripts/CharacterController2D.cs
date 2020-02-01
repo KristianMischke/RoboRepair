@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Newtonsoft.Json.Linq;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class CharacterController2D : MonoBehaviour
@@ -9,14 +10,14 @@ public class CharacterController2D : MonoBehaviour
     [SerializeField, Tooltip("Acceleration while grounded.")]
     float walkAcceleration = 75;
 
-    [SerializeField, Tooltip("Acceleration while in the air.")]
-    float airAcceleration = 30;
-
     [SerializeField, Tooltip("Deceleration applied when character is grounded and not attempting to move.")]
     float groundDeceleration = 70;
 
     [SerializeField, Tooltip("Max height the character will jump regardless of gravity")]
     float jumpHeight = 4;
+
+    [SerializeField]
+    bool testWithKeyboard = false;
 
     public Rigidbody2D robot;
 
@@ -24,12 +25,8 @@ public class CharacterController2D : MonoBehaviour
 
     private Vector2 velocity;
 
-
-    /// <summary>
-    /// Set to true when the character intersects a collider beneath
-    /// them in the previous frame.
-    /// </summary>
-    private bool grounded = true;
+    private float moveInputX;
+    private float moveInputY;
 
     private void Awake()
     {      
@@ -39,25 +36,11 @@ public class CharacterController2D : MonoBehaviour
     private void Update()
     {
         // Use GetAxisRaw to ensure our input is either 0, 1 or -1.
-        float moveInputX = Input.GetAxisRaw("Horizontal");
-        float moveInputY = Input.GetAxisRaw("Vertical");
-
-        // if (grounded)
-        // {
-        //     velocity.y = 0;
-
-        //     if (Input.GetButtonDown("Jump"))
-        //     {
-        //         // Calculate the velocity required to achieve the target jump height.
-        //         velocity.y = Mathf.Sqrt(2 * jumpHeight * Mathf.Abs(Physics2D.gravity.y));
-        //     }
-        // }
-
-         float acceleration = grounded ? walkAcceleration : airAcceleration;
-         float deceleration = grounded ? groundDeceleration : 0;
-
-
-
+        if (testWithKeyboard)
+        {
+            moveInputX = Input.GetAxisRaw("Horizontal");
+            moveInputY = Input.GetAxisRaw("Vertical");
+        }
         
         // Horizontal movement
         if (moveInputX != 0)
@@ -75,46 +58,35 @@ public class CharacterController2D : MonoBehaviour
         // Vertical movement
         if (moveInputY != 0)
         {
-            velocity.y = Mathf.MoveTowards(velocity.y, speed * moveInputY, acceleration * Time.deltaTime);
+            velocity.y = Mathf.MoveTowards(velocity.y, speed * moveInputY, walkAcceleration * Time.deltaTime);
             velocity.y = moveInputY;
         }
         else
         {
-            velocity.y = Mathf.MoveTowards(velocity.y, 0, deceleration * Time.deltaTime);
+            velocity.y = Mathf.MoveTowards(velocity.y, 0, groundDeceleration * Time.deltaTime);
             velocity.y = 0;
         }
 
         robot.AddForce(velocity, ForceMode2D.Impulse);
-        //velocity.y += Physics2D.gravity.y * Time.deltaTime;
+    }
 
-        //transform.Translate(velocity * Time.deltaTime);
+    public void ControllerAction(string ID, JToken data)
+    {
+        switch (ID)
+        {
+            case "dpadrelative-left":
+                {
+                    bool pressed = (bool)data["pressed"];
 
-        //grounded = false;
-
-        // // Retrieve all colliders we have intersected after velocity has been applied.
-        // Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, boxCollider.size, 0);
-
-        // foreach (Collider2D hit in hits)
-        // {
-        //     // Ignore our own collider.
-        //     if (hit == boxCollider)
-        //         continue;
-
-        //     ColliderDistance2D colliderDistance = hit.Distance(boxCollider);
-
-        //     // Ensure that we are still overlapping this collider.
-        //     // The overlap may no longer exist due to another intersected collider
-        //     // pushing us out of this one.
-        //     if (colliderDistance.isOverlapped)
-        //     {
-        //         transform.Translate(colliderDistance.pointA - colliderDistance.pointB);
-
-        //         // If we intersect an object beneath us, set grounded to true. 
-        //         if (Vector2.Angle(colliderDistance.normal, Vector2.up) < 90 && velocity.y < 0)
-        //         {
-        //             grounded = true;
-        //         }
-        //     }
-        // }
+                    switch ((string)(data["message"]["direction"]))
+                    {
+                        case "up":      moveInputY = pressed ? 1 : 0; break;
+                        case "down":    moveInputY = pressed ? -1 : 0; break;
+                        case "left":    moveInputX = pressed ? -1 : 0; break;
+                        case "right":   moveInputX = pressed ? 1 : 0; break;
+                    }
+                }
+                break;
+        }
     }
 }
