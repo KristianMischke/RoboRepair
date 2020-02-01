@@ -39,7 +39,7 @@ public class RobotPartPhysics : MonoBehaviour
             Debug.Log(otherPlayerID);
             if (otherPlayerID != playerID) {
                 //Debug.Log("Did it");
-                otherPlayer.hitpoints++;
+                otherPlayer.Heal();
                 this.gameObject.SetActive(false);
             }
         }

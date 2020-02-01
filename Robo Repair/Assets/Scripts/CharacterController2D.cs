@@ -53,11 +53,13 @@ public class CharacterController2D : MonoBehaviour
     // health/gamelogic
     public int playerID = -1;
 
-    // Changed to public so RobotPart can modify it
-    public int hitpoints = 10;
+    int hitpoints = 10;
     public const int MAX_HP = 20;
 
     HashSet<int> capturedPlayers = new HashSet<int>();
+
+    [SerializeField]
+    HPScript myHPBar;
 
     // Visuals
     List<Sprite> bodySprites;
@@ -143,6 +145,8 @@ public class CharacterController2D : MonoBehaviour
         colorSwapTex.Apply();
 
         legFrameTimer = LegFrameInterval;
+
+        myHPBar.UpdateHP(hitpoints);
     }
 
     private void Update()
@@ -361,9 +365,19 @@ public class CharacterController2D : MonoBehaviour
         if (hitpoints < 0)
             hitpoints = 0;
 
+        myHPBar.UpdateHP(hitpoints);
+
         //todo spawn parts
         GameObject robotPart = Instantiate(partPrefab, partParentTransform);
         robotPart.GetComponent<RobotPartPhysics>().playerID = this.playerID;
+    }
+
+    public void Heal()
+    {
+        hitpoints++;
+        if (hitpoints > MAX_HP)
+            hitpoints = MAX_HP;
+        myHPBar.UpdateHP(hitpoints);
     }
 
     public void ReleaseCapturedPlayers()

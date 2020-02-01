@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(SpriteRenderer))]
 public class HPScript : MonoBehaviour
 {
     [SerializeField] Sprite[] hpStages;
-    [SerializeField] SpriteRenderer mySR;
+    SpriteRenderer mySR;
 
     // Testing health bar
     /*void Update() {
@@ -16,8 +17,12 @@ public class HPScript : MonoBehaviour
             if (!upOrDown) { test++; }
             else { test--; }
             mySR.sprite = hpStages[test]; }}*/
+    private void Awake()
+    {
+        mySR = GetComponent<SpriteRenderer>();
+    }
 
-    void UpdateHP(int hp)
+    public void UpdateHP(int hp)
     {
         mySR.sprite = hpStages[hp];
     }
