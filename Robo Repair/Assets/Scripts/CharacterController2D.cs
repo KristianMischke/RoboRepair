@@ -136,11 +136,11 @@ public class CharacterController2D : MonoBehaviour
         velocity.Normalize();
         robot.AddForce(velocity, ForceMode2D.Impulse);
 
-        if (Input.GetAxisRaw("Jump") != 0 && !isHit) {
-            //isHit = true;
-            GameObject robotPart = Instantiate(partPrefab, partParentTransform);
+        //if (Input.GetAxisRaw("Jump") != 0 && !isHit) {
+        //    //isHit = true;
+        //    GameObject robotPart = Instantiate(partPrefab, partParentTransform);
             
-        }
+        //}
     }
 
     public void ControllerAction(string ID, JToken data)
@@ -223,6 +223,8 @@ public class CharacterController2D : MonoBehaviour
             hitpoints = 0;
 
         //todo spawn parts
+        GameObject robotPart = Instantiate(partPrefab, partParentTransform);
+        robotPart.GetComponent<RobotPartPhysics>().playerID = this.playerID;
     }
 
     public void ReleaseCapturedPlayers()
