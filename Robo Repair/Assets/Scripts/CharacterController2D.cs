@@ -48,6 +48,8 @@ public class CharacterController2D : MonoBehaviour
 
 
     public bool isHit = false;
+    bool hasCharged = false, stopWalkNoise = false;
+    
     // health/gamelogic
     public int playerID = -1;
 
@@ -145,6 +147,9 @@ public class CharacterController2D : MonoBehaviour
             }
         }
 
+        if (attackCharge > 0 && !hasCharged) { GameLogic.instance.soundGenerator.AddLaserChargeSound(); hasCharged = true; }
+        else if (attackCharge == 0) { hasCharged = false; }
+
         Vector2 direction = movePressed ? moveDir : Vector2.zero;
 
         // Use GetAxisRaw to ensure our input is either 0, 1 or -1.
@@ -193,6 +198,7 @@ public class CharacterController2D : MonoBehaviour
 
         if (direction != Vector2.zero)
         {
+            stopWalkNoise = false;
             GameLogic.instance.soundGenerator.AddWalkSound();
 
             legFrameTimer -= Time.deltaTime;
@@ -202,6 +208,7 @@ public class CharacterController2D : MonoBehaviour
                 legIndex = ++legIndex % legSprites.Count;
             }
         }
+        else if (stopWalkNoise == false) { GameLogic.instance.soundGenerator.StopWalkSound(); stopWalkNoise = true; }
 
         velocity.Normalize();
         robot.AddForce(velocity, ForceMode2D.Impulse);

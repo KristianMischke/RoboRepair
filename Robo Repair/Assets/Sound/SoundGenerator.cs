@@ -6,17 +6,18 @@ public class SoundGenerator : MonoBehaviour
 {
     [SerializeField] AudioSource mySource;
     [SerializeField] AudioClip[] randomClips;
-    [SerializeField] AudioClip swordSound, laserSound, walkSound, BGM;
+    [SerializeField] AudioClip swordSound, laserSound, laserChargeSound, walkSound, BGM;
     [SerializeField] float[] randRange;
     [SerializeField] float[] randRangeStart;
     float delta, timePassed;
-    bool addToBeat, addSwordSound, addLaserSound, addWalkSound;
+    bool addToBeat, addSwordSound, addLaserSound, addLaserChargeSound, addWalkSound;
     bool endBeatElement;
     bool stopWalk;
     float soundDelay;
     int soundsAdded;
     float BGMTime;
     const float BGMTimeConst = 411f;
+    bool callAgain = true;
 
     // Start is called before the first frame update
     void Start()
@@ -25,7 +26,7 @@ public class SoundGenerator : MonoBehaviour
         delta = 0f;
         timePassed = 0f;
         soundsAdded = 0;
-        addToBeat = false; addSwordSound = false; addLaserSound = false; addWalkSound = false;
+        addToBeat = false; addSwordSound = false; addLaserSound = false; addLaserChargeSound = false; addWalkSound = false;
         endBeatElement = false;
         stopWalk = false;
         BGMTime = 411f;
@@ -48,8 +49,10 @@ public class SoundGenerator : MonoBehaviour
 
         // Check if sword, laser, or walk sound is supposed to be played
         if (addSwordSound) { mySource.PlayOneShot(swordSound); addSwordSound = false; }
+        if (addLaserChargeSound) { mySource.PlayOneShot(laserChargeSound); addLaserChargeSound = false; }
         if (addLaserSound) { mySource.PlayOneShot(laserSound); addLaserSound = false; }
-        if (addWalkSound) {
+        if (addWalkSound && callAgain) {
+            callAgain = false;
             mySource.PlayOneShot(walkSound);
             stopWalk = false; addWalkSound = false;
             StartCoroutine(AddWalkLoop(1.5f, walkSound));
@@ -58,9 +61,10 @@ public class SoundGenerator : MonoBehaviour
     }
 
     public void AddSwordSound() { addSwordSound = true; }
+    public void AddLaserChargeSound() { addLaserChargeSound = true; }
     public void AddLaserSound() { addLaserSound = true; }
     public void AddWalkSound() { addWalkSound = true; }
-    public void StopWalkSound() { addWalkSound = false; stopWalk = true; }
+    public void StopWalkSound() { addWalkSound = false; stopWalk = true; callAgain = true; }
     public void AddRandomSound() { addToBeat = true; }
 
 
@@ -71,6 +75,7 @@ public class SoundGenerator : MonoBehaviour
         // Code to execute after the delay
         // If the time since the audioclip's entry into the beat began is greater than it should be, end the beat
         if (!stopWalk) { mySource.PlayOneShot(sound); StartCoroutine(AddWalkLoop(length, sound)); }
+        else { callAgain = true; }
     }
 
     IEnumerator AddSoundAfterTime(float time, float timeStart, float length, AudioClip sound)
