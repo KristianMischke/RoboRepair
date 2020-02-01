@@ -96,9 +96,16 @@ MonoBehaviour:
   speed: 9
   walkAcceleration: 75
   groundDeceleration: 70
-  jumpHeight: 4
   testWithKeyboard: 0
   robot: {fileID: 6324917998766935747}
+  meleeDistance: 2
+  attackChargeRate: 0.5
+  attackMaxCharge: 3
+  laserPrefab: {fileID: 1213358842995591917, guid: 5e102e86aa9f5bb438c3de0a1a8dbffe,
+    type: 3}
+  meleePrefab: {fileID: 6720561939196510886, guid: 0bfda437b2e5c7f4c9255dda0ba39eeb,
+    type: 3}
+  playerID: -1
 --- !u!1 &6324917999366543464
 GameObject:
   m_ObjectHideFlags: 0
