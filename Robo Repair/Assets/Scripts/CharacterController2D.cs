@@ -44,6 +44,7 @@ public class CharacterController2D : MonoBehaviour
 
     public GameObject laserPrefab;
     public GameObject meleePrefab;
+    public GameObject meleeMissPrefab;
 
 
     public bool isHit = false;
@@ -95,6 +96,8 @@ public class CharacterController2D : MonoBehaviour
                     }
                 }
 
+                GameLogic.instance.soundGenerator.AddLaserSound();
+
                 attackCharge = 0;
             }
         }
@@ -131,6 +134,11 @@ public class CharacterController2D : MonoBehaviour
         {
             velocity.y = Mathf.MoveTowards(velocity.y, 0, groundDeceleration * Time.deltaTime);
             velocity.y = 0;
+        }
+
+        if (direction != Vector2.zero)
+        {
+            GameLogic.instance.soundGenerator.AddWalkSound();
         }
 
         velocity.Normalize();
@@ -185,6 +193,7 @@ public class CharacterController2D : MonoBehaviour
     {
         RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, moveDir, meleeDistance);
 
+        bool didHit = false;
         foreach (RaycastHit2D hit in hits)
         {
             if (hit.collider.gameObject != this.gameObject)
@@ -200,6 +209,8 @@ public class CharacterController2D : MonoBehaviour
                 CharacterController2D otherPlayer = hit.collider.GetComponent<CharacterController2D>();
                 if (otherPlayer != null)
                 {
+                    didHit = true;
+
                     if (otherPlayer.hitpoints == 0)
                     {
                         otherPlayer.gameObject.SetActive(false);
@@ -212,6 +223,14 @@ public class CharacterController2D : MonoBehaviour
                 break;
             }
         }
+
+        if (!didHit)
+        {
+            GameObject newMelee = Instantiate(meleeMissPrefab);
+            newMelee.transform.position = transform.position + new Vector3(moveDir.x, moveDir.y);
+        }
+
+        GameLogic.instance.soundGenerator.AddSwordSound();
     }
 
     public void LaserHit(float laserPower)
@@ -236,5 +255,7 @@ public class CharacterController2D : MonoBehaviour
                 capturedPlayer.transform.position = transform.position + new Vector3(Random.Range(-1, 1), Random.Range(-1, 1), 0);
             }
         }
+
+        GameLogic.instance.soundGenerator.AddRandomSound();
     }
 }

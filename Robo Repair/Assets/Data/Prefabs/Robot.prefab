@@ -97,6 +97,8 @@ MonoBehaviour:
   walkAcceleration: 75
   groundDeceleration: 70
   testWithKeyboard: 0
+  partPrefab: {fileID: 0}
+  partParentTransform: {fileID: 0}
   robot: {fileID: 6324917998766935747}
   meleeDistance: 2
   attackChargeRate: 0.5
@@ -105,6 +107,9 @@ MonoBehaviour:
     type: 3}
   meleePrefab: {fileID: 6720561939196510886, guid: 0bfda437b2e5c7f4c9255dda0ba39eeb,
     type: 3}
+  meleeMissPrefab: {fileID: 9035713702920828509, guid: 18647c5a1cb34224eb477ae86f5484d1,
+    type: 3}
+  isHit: 0
   playerID: -1
 --- !u!1 &6324917999366543464
 GameObject:
