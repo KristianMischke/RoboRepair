@@ -73,6 +73,7 @@ public class SpriteManager : MonoBehaviour
                 float x = (v.startIndex.x + i) * SPRITE_SIZE;
                 float y = mainSpriteSheet.texture.height - SPRITE_SIZE - v.startIndex.y * SPRITE_SIZE;
                 Sprite newSprite = Sprite.Create(mainSpriteSheet.texture, new Rect(x, y, SPRITE_SIZE, SPRITE_SIZE), new Vector2(0.5f, 0.5f), SPRITE_SIZE);
+
                 spriteDictionary[v.baseID].Add(newSprite);
             }
         }
@@ -88,7 +89,7 @@ public class SpriteManager : MonoBehaviour
     }
 
     // Thanks to https://gamedevelopment.tutsplus.com/tutorials/how-to-use-a-shader-to-dynamically-swap-a-sprites-colors--cms-25129
-    public static void InitColorSwapTex(out Texture2D mColorSwapTex, out Color[] mSpriteColors)
+    public static void InitColorSwapTex(out Texture2D mColorSwapTex, out Color[] mSpriteColors, Texture2D refTexture = null)
     {
         Texture2D colorSwapTex = new Texture2D(256, 1, TextureFormat.RGBA32, false, false);
         colorSwapTex.filterMode = FilterMode.Point;
@@ -100,5 +101,14 @@ public class SpriteManager : MonoBehaviour
 
         mSpriteColors = new Color[colorSwapTex.width];
         mColorSwapTex = colorSwapTex;
+
+        if (refTexture != null)
+        {
+            foreach(Color32 c in refTexture.GetPixels())
+            {
+                colorSwapTex.SetPixel(c.r, 0, c);
+                mSpriteColors[c.r] = c;
+            }
+        }
     }
 }

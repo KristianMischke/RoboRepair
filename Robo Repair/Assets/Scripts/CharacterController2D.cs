@@ -70,9 +70,22 @@ public class CharacterController2D : MonoBehaviour
     float legFrameTimer = 0;
     Texture2D colorSwapTex;
     Color[] spriteColors;
-    enum SwapIndex
+    public enum SwapIndex
     {
-        
+        Metal0 = 70,
+        Metal1 = 83,
+        Metal2 = 115,
+        Metal3 = 140,
+        Metal4 = 185,
+        Metal5 = 221,
+
+        Glow0 = 255,
+        Glow1 = 252,
+        Glow2 = 209,
+        Glow3 = 153,
+
+        WireA = 0,
+        WireB = 1
     }
 
     void SwapColor(SwapIndex index, Color color)
@@ -81,7 +94,7 @@ public class CharacterController2D : MonoBehaviour
         colorSwapTex.SetPixel((int)index, 0, color);
     }
 
-    public float LegFrameInterval { get { return 0.1f; } }
+    public float LegFrameInterval { get { return 0.03f; } }
 
     private void Start()
     {
@@ -92,9 +105,42 @@ public class CharacterController2D : MonoBehaviour
         bodyRenderer = transform.Find("RobotBody").GetComponent<SpriteRenderer>();
         legRenderer = transform.Find("RobotLegs").GetComponent<SpriteRenderer>();
 
-        SpriteManager.InitColorSwapTex(out colorSwapTex, out spriteColors);
+        SpriteManager.InitColorSwapTex(out colorSwapTex, out spriteColors, bodySprites[0].texture);
         bodyRenderer.material.SetTexture("_SwapTex", colorSwapTex);
         legRenderer.material.SetTexture("_SwapTex", colorSwapTex);
+
+        //DO SWAP
+        SwapColor(SwapIndex.WireA, new Color(Random.Range(0, 1), Random.Range(0, 1), Random.Range(0, 1)));
+        SwapColor(SwapIndex.WireB, new Color(Random.Range(0, 1), Random.Range(0, 1), Random.Range(0, 1)));
+
+        Vector3 metalOffset = new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f));
+        Color glowOffset = new Color(Random.Range(0.4f, 0.8f), Random.Range(0.4f, 0.8f), Random.Range(0.4f, 0.8f));
+        Color baseGlow = spriteColors[(int)SwapIndex.Glow3];
+        
+        for (SwapIndex i = 0; i < (SwapIndex)256; i++)
+        {
+            Color refColor = colorSwapTex.GetPixel((int)i, 0);
+            if (i == SwapIndex.Metal0
+                || i == SwapIndex.Metal1
+                || i == SwapIndex.Metal2
+                || i == SwapIndex.Metal3
+                || i == SwapIndex.Metal4
+                || i == SwapIndex.Metal5)
+            {
+                Color newColor = new Color(Mathf.Clamp(refColor.r + metalOffset.x, 0, 1), Mathf.Clamp(refColor.g + metalOffset.y, 0, 1), Mathf.Clamp(refColor.b + metalOffset.z, 0, 1));
+                SwapColor(i, newColor);
+            }
+            if (i == SwapIndex.Glow0
+                || i == SwapIndex.Glow1
+                || i == SwapIndex.Glow2
+                || i == SwapIndex.Glow3)
+            {
+                Color newColor = glowOffset + (refColor - baseGlow);
+                newColor.a = 1f;
+                SwapColor(i, newColor);
+            }
+        }
+        colorSwapTex.Apply();
 
         legFrameTimer = LegFrameInterval;
     }
@@ -219,7 +265,7 @@ public class CharacterController2D : MonoBehaviour
 
         //}
 
-        bodyIndex = bodySprites.Count - Mathf.RoundToInt(bodySprites.Count * ((float)hitpoints / MAX_HP));
+        bodyIndex = Mathf.Clamp(bodySprites.Count - Mathf.RoundToInt(bodySprites.Count * ((float)hitpoints / MAX_HP)), 0, bodySprites.Count-1);
 
         bodyRenderer.sprite = bodySprites[bodyIndex];
         legRenderer.sprite = legSprites[legIndex];
