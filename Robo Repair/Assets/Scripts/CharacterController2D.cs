@@ -49,7 +49,9 @@ public class CharacterController2D : MonoBehaviour
     public bool isHit = false;
     // health/gamelogic
     public int playerID = -1;
-    private int hitpoints = 10;
+
+    // Changed to public so RobotPart can modify it
+    public int hitpoints = 10;
 
     HashSet<int> capturedPlayers = new HashSet<int>();
 
@@ -106,6 +108,18 @@ public class CharacterController2D : MonoBehaviour
         {
             direction.x = Input.GetAxisRaw("Horizontal");
             direction.y = Input.GetAxisRaw("Vertical");
+            moveDir = direction;
+
+            
+            attackPressed = Input.GetMouseButton(0);
+            
+            attackDir = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+            attackDir.Normalize();
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                DoMelee();
+            }
         }
         
         // Horizontal movement

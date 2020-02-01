@@ -110,6 +110,7 @@ MonoBehaviour:
     type: 3}
   isHit: 0
   playerID: -1
+  hitpoints: 10
 --- !u!1 &6324917999366543464
 GameObject:
   m_ObjectHideFlags: 0
