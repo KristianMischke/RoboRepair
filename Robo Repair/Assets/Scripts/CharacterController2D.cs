@@ -362,7 +362,7 @@ public class CharacterController2D : MonoBehaviour
         {
             for (int i = 0; i < pointsLost; i++)
             {
-                GameObject robotPart = Instantiate(partPrefab, transform);
+                GameObject robotPart = Instantiate(partPrefab, GameLogic.instance.playerParentTransform);
                 robotPart.transform.position = transform.position;
                 SpriteRenderer sr = robotPart.GetComponent<SpriteRenderer>();
                 sr.sprite = partSprites[Random.Range(0, partSprites.Count)];
@@ -379,9 +379,9 @@ public class CharacterController2D : MonoBehaviour
         myHPBar.UpdateHP(hitpoints);
     }
 
-    public void Heal()
+    public void Heal(int amount = 1)
     {
-        hitpoints++;
+        hitpoints += amount;
         if (hitpoints > MAX_HP)
             hitpoints = MAX_HP;
         myHPBar.UpdateHP(hitpoints);
@@ -395,7 +395,8 @@ public class CharacterController2D : MonoBehaviour
             if (capturedPlayer != null)
             {
                 capturedPlayer.gameObject.SetActive(true);
-                capturedPlayer.transform.position = transform.position + new Vector3(Random.Range(-1, 1), Random.Range(-1, 1), 0);
+                capturedPlayer.transform.position = transform.position + new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0);
+                capturedPlayer.Heal(8);
             }
         }
 
