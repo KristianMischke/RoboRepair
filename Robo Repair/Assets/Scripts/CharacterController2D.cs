@@ -53,8 +53,49 @@ public class CharacterController2D : MonoBehaviour
 
     // Changed to public so RobotPart can modify it
     public int hitpoints = 10;
+    public const int MAX_HP = 20;
 
     HashSet<int> capturedPlayers = new HashSet<int>();
+
+    // Visuals
+    List<Sprite> bodySprites;
+    List<Sprite> legSprites;
+    List<Sprite> partSprites;
+    int bodyIndex;
+    int legIndex;
+    SpriteRenderer bodyRenderer;
+    SpriteRenderer legRenderer;
+    float legFrameTimer = 0;
+    Texture2D colorSwapTex;
+    Color[] spriteColors;
+    enum SwapIndex
+    {
+        
+    }
+
+    void SwapColor(SwapIndex index, Color color)
+    {
+        spriteColors[(int)index] = color;
+        colorSwapTex.SetPixel((int)index, 0, color);
+    }
+
+    public float LegFrameInterval { get { return 0.1f; } }
+
+    private void Start()
+    {
+        bodySprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.ROBOT_SPRITES + Random.Range(0, SpriteManager.NUM_ROBOTS));
+        legSprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.LEG_SPRITES);
+        partSprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.PART_SPRITES);
+
+        bodyRenderer = transform.Find("RobotBody").GetComponent<SpriteRenderer>();
+        legRenderer = transform.Find("RobotLegs").GetComponent<SpriteRenderer>();
+
+        SpriteManager.InitColorSwapTex(out colorSwapTex, out spriteColors);
+        bodyRenderer.material.SetTexture("_SwapTex", colorSwapTex);
+        legRenderer.material.SetTexture("_SwapTex", colorSwapTex);
+
+        legFrameTimer = LegFrameInterval;
+    }
 
     private void Update()
     {
@@ -153,6 +194,13 @@ public class CharacterController2D : MonoBehaviour
         if (direction != Vector2.zero)
         {
             GameLogic.instance.soundGenerator.AddWalkSound();
+
+            legFrameTimer -= Time.deltaTime;
+            if (legFrameTimer <= 0)
+            {
+                legFrameTimer += LegFrameInterval;
+                legIndex = ++legIndex % legSprites.Count;
+            }
         }
 
         velocity.Normalize();
@@ -161,8 +209,13 @@ public class CharacterController2D : MonoBehaviour
         //if (Input.GetAxisRaw("Jump") != 0 && !isHit) {
         //    //isHit = true;
         //    GameObject robotPart = Instantiate(partPrefab, partParentTransform);
-            
+
         //}
+
+        bodyIndex = bodySprites.Count - Mathf.RoundToInt(bodySprites.Count * ((float)hitpoints / MAX_HP));
+
+        bodyRenderer.sprite = bodySprites[bodyIndex];
+        legRenderer.sprite = legSprites[legIndex];
     }
 
     public void ControllerAction(string ID, JToken data)
