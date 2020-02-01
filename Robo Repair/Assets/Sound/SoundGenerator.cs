@@ -57,11 +57,11 @@ public class SoundGenerator : MonoBehaviour
         AddBeat();
     }
 
-    void AddSwordSound() { addSwordSound = true; }
-    void AddLaserSound() { addLaserSound = true; }
-    void AddWalkSound() { addWalkSound = true; }
-    void StopWalkSound() { addWalkSound = false; stopWalk = true; }
-    void AddRandomSound() { addToBeat = true; }
+    public void AddSwordSound() { addSwordSound = true; }
+    public void AddLaserSound() { addLaserSound = true; }
+    public void AddWalkSound() { addWalkSound = true; }
+    public void StopWalkSound() { addWalkSound = false; stopWalk = true; }
+    public void AddRandomSound() { addToBeat = true; }
 
 
     IEnumerator AddWalkLoop(float length, AudioClip sound)

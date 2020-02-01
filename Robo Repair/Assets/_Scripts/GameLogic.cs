@@ -14,6 +14,9 @@ public class GameLogic : MonoBehaviour
     [SerializeField]
     public Transform playerParentTransform;
 
+    [SerializeField]
+    public SoundGenerator soundGenerator;
+
     private Dictionary<int, CharacterController2D> players = new Dictionary<int, CharacterController2D>();
 
     void Start()

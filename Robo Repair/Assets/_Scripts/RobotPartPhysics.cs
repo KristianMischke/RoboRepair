@@ -28,14 +28,19 @@ public class RobotPartPhysics : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void OnTriggerEnter2D(Collider2D collision)
     {
+        //Debug.Log("AAAAAAAAAAAAA");
         CharacterController2D otherPlayer = collision.GetComponent<CharacterController2D>();
-        int otherPlayerID = otherPlayer.playerID;
+
 
         if (otherPlayer != null) {
+            int otherPlayerID = otherPlayer.playerID;
+            Debug.Log(otherPlayerID);
             if (otherPlayerID != playerID) {
-
+                //Debug.Log("Did it");
+                otherPlayer.hitpoints++;
+                this.gameObject.SetActive(false);
             }
         }
     }
