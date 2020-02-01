@@ -6,6 +6,8 @@ using Newtonsoft.Json.Linq;
 
 public class GameLogic : MonoBehaviour
 {
+    public static GameLogic instance;
+
     [SerializeField]
     public GameObject playerPrefab;
 
@@ -16,6 +18,10 @@ public class GameLogic : MonoBehaviour
 
     void Start()
     {
+        if (instance != null && instance != this)
+            Debug.LogError("Singleton GameLogic should not be instantiated more than once!");
+        instance = this;
+
         AirConsole.instance.onReady += OnReady;
         AirConsole.instance.onMessage += OnMessage;
         AirConsole.instance.onConnect += OnConnect;
@@ -32,7 +38,18 @@ public class GameLogic : MonoBehaviour
             return;
 
         GameObject newPlayer = Instantiate(playerPrefab, playerParentTransform);
+        newPlayer.name = "Player" + deviceID;
         players[deviceID] = newPlayer.GetComponent<CharacterController2D>();
+        players[deviceID].playerID = deviceID;
+    }
+
+    public CharacterController2D GetPlayerByID(int deviceID)
+    {
+        if (players.TryGetValue(deviceID, out CharacterController2D player))
+        {
+            return player;
+        }
+        return null;
     }
 
     void OnReady(string code)
