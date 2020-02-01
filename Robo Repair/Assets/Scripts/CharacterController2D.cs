@@ -19,6 +19,12 @@ public class CharacterController2D : MonoBehaviour
     [SerializeField]
     bool testWithKeyboard = false;
 
+    [SerializeField]
+    public GameObject partPrefab;
+
+    [SerializeField]
+    public Transform partParentTransform;
+
     public Rigidbody2D robot;
 
     private BoxCollider2D boxCollider;
@@ -27,6 +33,8 @@ public class CharacterController2D : MonoBehaviour
 
     private float moveInputX;
     private float moveInputY;
+
+    public bool isHit = false;
 
     private void Awake()
     {      
@@ -68,6 +76,12 @@ public class CharacterController2D : MonoBehaviour
         }
 
         robot.AddForce(velocity, ForceMode2D.Impulse);
+
+        if (Input.GetAxisRaw("Jump") != 0 && !isHit) {
+            //isHit = true;
+            GameObject robotPart = Instantiate(partPrefab, partParentTransform);
+            
+        }
     }
 
     public void ControllerAction(string ID, JToken data)
