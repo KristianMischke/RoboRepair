@@ -56,6 +56,8 @@ public class CharacterController2D : MonoBehaviour
 
     HashSet<int> capturedPlayers = new HashSet<int>();
 
+    bool hasCharged = false, stopWalkNoise = false;
+
     private void Update()
     {
 
@@ -103,6 +105,9 @@ public class CharacterController2D : MonoBehaviour
                 attackCharge = 0;
             }
         }
+
+        if (attackCharge > 0 && !hasCharged) { GameLogic.instance.soundGenerator.AddLaserChargeSound(); hasCharged = true; }
+        else if (attackCharge == 0) { hasCharged = false; }
 
         Vector2 direction = movePressed ? moveDir : Vector2.zero;
 
@@ -152,8 +157,10 @@ public class CharacterController2D : MonoBehaviour
 
         if (direction != Vector2.zero)
         {
+            stopWalkNoise = false;
             GameLogic.instance.soundGenerator.AddWalkSound();
         }
+        else if (stopWalkNoise == false) { GameLogic.instance.soundGenerator.StopWalkSound(); stopWalkNoise = true; }
 
         velocity.Normalize();
         robot.AddForce(velocity, ForceMode2D.Impulse);
