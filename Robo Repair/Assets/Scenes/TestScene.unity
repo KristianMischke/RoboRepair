@@ -419,7 +419,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ee516e7c872c4243abb756cc872a782, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainSpriteSheet: {fileID: 21300000, guid: dbff357eb6232f84a822b9316cd14188, type: 3}
 --- !u!1001 &515985514
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1430,5 +1429,15 @@ PrefabInstance:
       propertyPath: right
       value: 
       objectReference: {fileID: 850079084}
+    - target: {fileID: 1693492816369376059, guid: ab3912ebc7dad014f8ed08e22a649b03,
+        type: 3}
+      propertyPath: clumpingArea.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1693492816369376059, guid: ab3912ebc7dad014f8ed08e22a649b03,
+        type: 3}
+      propertyPath: clumpingArea.y
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ab3912ebc7dad014f8ed08e22a649b03, type: 3}

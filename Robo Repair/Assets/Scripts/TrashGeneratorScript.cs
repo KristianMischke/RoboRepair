@@ -73,7 +73,7 @@ public class TrashGeneratorScript : MonoBehaviour
         Vector3 diff;
         float dist;
 
-        for (int l = 1; l < rand + 1; l++) {
+        for (int l = 1; l < rand; l++) {
             //Vector3 check = toReturn;
             //toReturn = new Vector3(0f, 0f, 0f);
 

@@ -40,7 +40,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1693492816369376057}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ca26a6d870cc7349a20c195ddd1935c, type: 3}
+  m_Script: {fileID: 11500000, guid: 7f19ad45b8b2648588701af2319f4a4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   top: {fileID: 0}
@@ -80,11 +80,11 @@ MonoBehaviour:
   smallTrashSprites:
   - {fileID: -942494204440328609, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
   - {fileID: 1603184614873367213, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
-  edgeBoundaryModifier: 2
+  edgeBoundaryModifier: 1.75
   spawnRanges:
   - {x: 2, y: 6}
   - {x: 7, y: 11}
   - {x: 4, y: 7}
   - {x: 4, y: 7}
-  clumpingArea: {x: 0.5, y: 0.5}
+  clumpingArea: {x: 1, y: 1}
   numberClumped: 3
