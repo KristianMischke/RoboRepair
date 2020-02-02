@@ -365,7 +365,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a095622ff471b438594d61d09930d356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 9
+  speed: 0.5
   walkAcceleration: 75
   groundDeceleration: 70
   testWithKeyboard: 0
@@ -381,7 +381,6 @@ MonoBehaviour:
     type: 3}
   meleeMissPrefab: {fileID: 9035713702920828509, guid: 18647c5a1cb34224eb477ae86f5484d1,
     type: 3}
-  isHit: 0
   playerID: -1
   myHPBar: {fileID: 3466416449729456961}
 --- !u!1 &6324917999366543464
