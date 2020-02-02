@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
+using UnityEngine.UI;
+using TMPro;
+
 
 [RequireComponent(typeof(Collider2D))]
 public class CharacterController2D : MonoBehaviour
@@ -64,6 +67,9 @@ public class CharacterController2D : MonoBehaviour
 
     [SerializeField]
     HPScript myHPBar;
+
+    [SerializeField]
+    TMP_Text myText;
 
     // Visuals
     List<Sprite> bodySprites;
@@ -208,6 +214,10 @@ public class CharacterController2D : MonoBehaviour
         wireFrameTimer = WireFrameInterval;
 
         myHPBar.UpdateHP(hitpoints);
+
+        //myText.text = "Player " + playerID;
+
+        myText.SetText("Player " + playerID);
     }
 
     private void Update()
