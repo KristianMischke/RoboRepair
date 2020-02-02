@@ -31,6 +31,8 @@ public class CharacterController2D : MonoBehaviour
     // Attack params
     [SerializeField]
     private float meleeDistance = 2f;
+    private float meleeAttackTimer = 0;
+    private float meleeAttackDelay { get { return 0.8f; } }
     [SerializeField, Tooltip("amount of charge gained per second")]
     private float attackChargeRate = 0.5f;
     [SerializeField]
@@ -44,7 +46,9 @@ public class CharacterController2D : MonoBehaviour
     public GameObject meleeMissPrefab;
 
 
-    public bool isHit = false;
+    bool isBlinking = false;
+    float blinkTimer = 0;
+
     bool hasCharged = false, stopWalkNoise = false;
     
     // health/gamelogic
@@ -64,6 +68,7 @@ public class CharacterController2D : MonoBehaviour
     List<Sprite> wireSprites;
     List<Sprite> partSprites;
     List<Sprite> shinySprites;
+    List<Sprite> chargeSprites;
     int bodyIndex;
     int legIndex;
     int wireIndex;
@@ -72,11 +77,14 @@ public class CharacterController2D : MonoBehaviour
     SpriteRenderer legRenderer;
     SpriteRenderer wireRenderer;
     SpriteRenderer shinyRenderer;
+    SpriteRenderer chargeRenderer;
+    LineRenderer crosshair;
     float legFrameTimer = 0;
     float wireFrameTimer = 0;
     float shinyTimer = 0;
-    Texture2D colorSwapTex;
+    Texture2D mainColorSwapTex;
     Color[] spriteColors;
+    Texture2D justRobotSwapTex;
     public enum SwapIndex
     {
         Metal0 = 70,
@@ -86,10 +94,11 @@ public class CharacterController2D : MonoBehaviour
         Metal4 = 185,
         Metal5 = 221,
 
-        Glow0 = 255,
-        Glow1 = 252,
-        Glow2 = 209,
-        Glow3 = 153,
+        Glow0 = 254,
+        Glow1 = 255,
+        Glow2 = 252,
+        Glow3 = 209,
+        Glow4 = 153,
 
         WireA = 1,
         WireB = 2
@@ -98,7 +107,24 @@ public class CharacterController2D : MonoBehaviour
     void SwapColor(SwapIndex index, Color color)
     {
         spriteColors[(int)index] = color;
-        colorSwapTex.SetPixel((int)index, 0, color);
+        mainColorSwapTex.SetPixel((int)index, 0, color);
+    }
+
+    void SetRobotColor(Color color, bool useBase)
+    {
+        for (int i = 0; i < 255; i++)
+        {
+            if (useBase)
+            {
+                justRobotSwapTex.SetPixel(i, 0, spriteColors[i]);
+            }
+            else
+            {
+                justRobotSwapTex.SetPixel(i, 0, color);
+            }
+        }
+
+        justRobotSwapTex.Apply();
     }
 
     public float LegFrameInterval { get { return 0.03f; } }
@@ -111,30 +137,33 @@ public class CharacterController2D : MonoBehaviour
         wireSprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.WIRE_SPRITES);
         partSprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.PART_SPRITES);
         shinySprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.SHINY_SPRITES);
+        chargeSprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.CHARGE_SPRITES);
 
         bodyRenderer = transform.Find("RobotBody").GetComponent<SpriteRenderer>();
         legRenderer = transform.Find("RobotLegs").GetComponent<SpriteRenderer>();
         wireRenderer = transform.Find("RobotWires").GetComponent<SpriteRenderer>();
         shinyRenderer = transform.Find("RobotShiny").GetComponent<SpriteRenderer>();
+        chargeRenderer = transform.Find("ChargeFlare").GetComponent<SpriteRenderer>();
+        crosshair = transform.Find("Crosshair").GetComponent<LineRenderer>();
 
 
-        SpriteManager.InitColorSwapTex(out colorSwapTex, out spriteColors, bodySprites[0].texture);
-        bodyRenderer.material.SetTexture("_SwapTex", colorSwapTex);
-        legRenderer.material.SetTexture("_SwapTex", colorSwapTex);
-        wireRenderer.material.SetTexture("_SwapTex", colorSwapTex);
-        shinyRenderer.material.SetTexture("_SwapTex", colorSwapTex);
+        SpriteManager.InitColorSwapTex(out mainColorSwapTex, out spriteColors, bodySprites[0].texture);
+        SpriteManager.InitColorSwapTex(out justRobotSwapTex, out _, bodySprites[0].texture);
+        bodyRenderer.material.SetTexture("_SwapTex", justRobotSwapTex);
+        legRenderer.material.SetTexture("_SwapTex", justRobotSwapTex);
+        wireRenderer.material.SetTexture("_SwapTex", justRobotSwapTex);
+        shinyRenderer.material.SetTexture("_SwapTex", justRobotSwapTex);
 
         //DO SWAP
         SwapColor(SwapIndex.WireA, new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f)));
         SwapColor(SwapIndex.WireB, new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f)));
 
-        Vector3 metalOffset = new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f));
-        Color glowOffset = new Color(Random.Range(0.4f, 0.8f), Random.Range(0.4f, 0.8f), Random.Range(0.4f, 0.8f));
-        Color baseGlow = spriteColors[(int)SwapIndex.Glow3];
+        float metalHue = Random.Range(0f, 1f);
+        float glowHue = Random.Range(0f, 1f);
         
         for (SwapIndex i = 0; i < (SwapIndex)256; i++)
         {
-            Color refColor = colorSwapTex.GetPixel((int)i, 0);
+            Color refColor = spriteColors[(int)i];
             if (i == SwapIndex.Metal0
                 || i == SwapIndex.Metal1
                 || i == SwapIndex.Metal2
@@ -142,20 +171,35 @@ public class CharacterController2D : MonoBehaviour
                 || i == SwapIndex.Metal4
                 || i == SwapIndex.Metal5)
             {
-                Color newColor = new Color(Mathf.Clamp(refColor.r + metalOffset.x, 0, 1), Mathf.Clamp(refColor.g + metalOffset.y, 0, 1), Mathf.Clamp(refColor.b + metalOffset.z, 0, 1));
+                Color.RGBToHSV(refColor, out float H, out float S, out float V);
+                H = metalHue;
+                Color newColor = Color.HSVToRGB(H, S, V);
                 SwapColor(i, newColor);
             }
             if (i == SwapIndex.Glow0
                 || i == SwapIndex.Glow1
                 || i == SwapIndex.Glow2
-                || i == SwapIndex.Glow3)
+                || i == SwapIndex.Glow3
+                || i == SwapIndex.Glow4)
             {
-                Color newColor = glowOffset + (refColor - baseGlow);
-                newColor.a = 1f;
+                Color.RGBToHSV(refColor, out float H, out float S, out float V);
+                H = glowHue;
+                Color newColor = Color.HSVToRGB(H, S, V);
                 SwapColor(i, newColor);
+
+                if (i == SwapIndex.Glow4)
+                {
+                    crosshair.startColor = newColor;
+                    chargeRenderer.material.color = newColor;
+                }
+                if (i == SwapIndex.Glow0)
+                {
+                    crosshair.endColor = newColor;
+                }
             }
         }
-        colorSwapTex.Apply();
+        mainColorSwapTex.Apply();
+        SetRobotColor(Color.clear, true);
 
         legFrameTimer = LegFrameInterval;
         wireFrameTimer = WireFrameInterval;
@@ -166,10 +210,18 @@ public class CharacterController2D : MonoBehaviour
     private void Update()
     {
 
+        crosshair.enabled = attackPressed;
+        chargeRenderer.gameObject.SetActive(attackPressed);
         // charge attack
         if (attackPressed)
         {
             attackCharge = Mathf.Min(attackCharge + Time.deltaTime * attackChargeRate, attackMaxCharge);
+
+            crosshair.SetPosition(0, transform.position + (Vector3)attackDir.normalized * 0.4f);
+            crosshair.SetPosition(1, transform.position + (Vector3)attackDir.normalized * 1f);
+            crosshair.startWidth = crosshair.endWidth = Mathf.Clamp01(attackCharge / attackMaxCharge) * 0.3f;
+
+            chargeRenderer.sprite = chargeSprites[Mathf.FloorToInt(Mathf.Clamp01(attackCharge / attackMaxCharge) * (chargeSprites.Count - 1))];
         }
         else
         {
@@ -181,7 +233,7 @@ public class CharacterController2D : MonoBehaviour
 
                 foreach (RaycastHit2D hit in hits)
                 {
-                    if (hit.collider.gameObject != this.gameObject && hit.collider.GetComponent<RobotPartPhysics>() == null)
+                    if (hit.collider.gameObject != this.gameObject && hit.collider.GetComponent<RobotPartPhysics>() == null && hit.collider.GetComponent<MagnetCollider>() == null)
                     {
                         // first hit other than me
                         
@@ -191,11 +243,12 @@ public class CharacterController2D : MonoBehaviour
                         SpriteRenderer sr = newLaser.GetComponent<SpriteRenderer>();
                         newLaser.transform.Rotate(Vector3.forward, Vector2.SignedAngle(Vector2.right, attackDir.normalized));
                         sr.size = new Vector2(hit.distance, 1);
+                        sr.material.SetTexture("_SwapTex", mainColorSwapTex);
                         DespawnAnimation dAnim = newLaser.GetComponent<DespawnAnimation>();
                         dAnim.incrementIndex = false;
                         dAnim.FrameTimer = 0.2f;
                         dAnim.spriteList = SpriteManager.instance.GetModifiedSprites(SpriteManager.LASER_SPRITES);
-                        dAnim.spriteIndex = Mathf.FloorToInt(attackCharge/attackMaxCharge*dAnim.spriteList.Count);
+                        dAnim.spriteIndex = Mathf.FloorToInt(Mathf.Clamp01(attackCharge/attackMaxCharge) * (dAnim.spriteList.Count-1));
 
                         // deal damage to player
                         CharacterController2D otherPlayer = hit.collider.GetComponent<CharacterController2D>();
@@ -237,31 +290,6 @@ public class CharacterController2D : MonoBehaviour
             {
                 DoMelee();
             }
-        }
-        
-        // Horizontal movement
-        if (direction.x != 0)
-        {
-            //velocity.x = Mathf.MoveTowards(velocity.x, speed * moveInputX, acceleration * Time.deltaTime);
-            velocity.x = direction.x;
-            
-        }
-        else
-        {
-            //velocity.x = Mathf.MoveTowards(velocity.x, 0, deceleration * Time.deltaTime);
-            velocity.x = 0;
-        }
-
-        // Vertical movement
-        if (direction.y != 0)
-        {
-            velocity.y = Mathf.MoveTowards(velocity.y, speed * direction.y, walkAcceleration * Time.deltaTime);
-            velocity.y = direction.y;
-        }
-        else
-        {
-            velocity.y = Mathf.MoveTowards(velocity.y, 0, groundDeceleration * Time.deltaTime);
-            velocity.y = 0;
         }
 
         if (direction != Vector2.zero)
@@ -308,8 +336,9 @@ public class CharacterController2D : MonoBehaviour
             }
         }
 
+        velocity = direction;
         velocity.Normalize();
-        robot.AddForce(velocity, ForceMode2D.Impulse);
+        robot.AddForce(velocity * speed, ForceMode2D.Impulse);
 
         //if (Input.GetAxisRaw("Jump") != 0 && !isHit) {
         //    //isHit = true;
@@ -330,6 +359,29 @@ public class CharacterController2D : MonoBehaviour
         legRenderer.transform.localScale = scale;
         wireRenderer.transform.localScale = scale;
         shinyRenderer.transform.localScale = scale;
+
+        if (hitpoints == 0)
+        {
+            isBlinking = true;
+            if (blinkTimer <= -0.2f)
+            {
+                blinkTimer = 0.2f;
+                SetRobotColor(Color.red, false);
+            }
+        }
+
+        if (isBlinking)
+        {
+            blinkTimer -= Time.deltaTime;
+            if (blinkTimer <= 0)
+            {
+                SetRobotColor(Color.clear, true);
+                isBlinking = false;
+            }
+        }
+
+        if (meleeAttackTimer > 0f)
+            meleeAttackTimer -= Time.deltaTime;
     }
 
     public void ControllerAction(string ID, JToken data)
@@ -372,6 +424,11 @@ public class CharacterController2D : MonoBehaviour
 
     private void DoMelee()
     {
+        if (meleeAttackTimer > 0f)
+            return;
+
+        meleeAttackTimer = meleeAttackDelay;
+
         RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, moveDir, meleeDistance);
 
         bool didHit = false;
@@ -426,8 +483,9 @@ public class CharacterController2D : MonoBehaviour
                 robotPart.transform.position = transform.position;
                 SpriteRenderer sr = robotPart.GetComponent<SpriteRenderer>();
                 sr.sprite = partSprites[Random.Range(0, partSprites.Count)];
-                sr.material.SetTexture("_SwapTex", colorSwapTex);
-                robotPart.GetComponent<RobotPartPhysics>().playerID = this.playerID;
+
+                sr.material.SetTexture("_SwapTex", mainColorSwapTex);
+                robotPart.GetComponentInChildren<RobotPartPhysics>().playerID = this.playerID;
             }
         }
 
@@ -437,6 +495,10 @@ public class CharacterController2D : MonoBehaviour
             hitpoints = 0;
 
         myHPBar.UpdateHP(hitpoints);
+
+        SetRobotColor(Color.white, false);
+        isBlinking = true;
+        blinkTimer = 0.4f;
     }
 
     public void Heal(int amount = 1)
