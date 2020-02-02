@@ -23,7 +23,8 @@ public class RobotPartPhysics : MonoBehaviour
     void Update()
     {
         if (!addedForce) {
-            robotPart.AddForce(new Vector2(1f, 0f), ForceMode2D.Impulse);
+            robotPart.AddForce(new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized, ForceMode2D.Impulse);
+            robotPart.AddTorque(Random.Range(-1f, 1f));
             addedForce = true;
         }
     }
@@ -39,7 +40,7 @@ public class RobotPartPhysics : MonoBehaviour
             Debug.Log(otherPlayerID);
             if (otherPlayerID != playerID) {
                 //Debug.Log("Did it");
-                otherPlayer.hitpoints++;
+                otherPlayer.Heal();
                 this.gameObject.SetActive(false);
             }
         }
