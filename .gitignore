@@ -35,3 +35,5 @@ sysinfo.txt
 *.apk
 *.unitypackage
 Robo Repair/.DS_Store
+.DS_Store
+GGJ_directory_structure/.DS_Store
