@@ -86,5 +86,5 @@ MonoBehaviour:
   - {x: 7, y: 11}
   - {x: 4, y: 7}
   - {x: 4, y: 7}
-  clumpingArea: {x: 1, y: 1}
+  clumpingArea: {x: 0.65, y: 0.65}
   numberClumped: 3
