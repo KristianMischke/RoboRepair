@@ -50,7 +50,7 @@ public class CharacterController2D : MonoBehaviour
     // health/gamelogic
     public int playerID = -1;
 
-    int hitpoints = 10;
+    int hitpoints = 12;
     public const int MAX_HP = 20;
 
     HashSet<int> capturedPlayers = new HashSet<int>();
@@ -61,12 +61,20 @@ public class CharacterController2D : MonoBehaviour
     // Visuals
     List<Sprite> bodySprites;
     List<Sprite> legSprites;
+    List<Sprite> wireSprites;
     List<Sprite> partSprites;
+    List<Sprite> shinySprites;
     int bodyIndex;
     int legIndex;
+    int wireIndex;
+    int shinyIndex;
     SpriteRenderer bodyRenderer;
     SpriteRenderer legRenderer;
+    SpriteRenderer wireRenderer;
+    SpriteRenderer shinyRenderer;
     float legFrameTimer = 0;
+    float wireFrameTimer = 0;
+    float shinyTimer = 0;
     Texture2D colorSwapTex;
     Color[] spriteColors;
     public enum SwapIndex
@@ -83,8 +91,8 @@ public class CharacterController2D : MonoBehaviour
         Glow2 = 209,
         Glow3 = 153,
 
-        WireA = 0,
-        WireB = 1
+        WireA = 1,
+        WireB = 2
     }
 
     void SwapColor(SwapIndex index, Color color)
@@ -94,23 +102,31 @@ public class CharacterController2D : MonoBehaviour
     }
 
     public float LegFrameInterval { get { return 0.03f; } }
+    public float WireFrameInterval { get { return 0.25f; } }
 
     private void Start()
     {
         bodySprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.ROBOT_SPRITES + Random.Range(0, SpriteManager.NUM_ROBOTS));
         legSprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.LEG_SPRITES);
+        wireSprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.WIRE_SPRITES);
         partSprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.PART_SPRITES);
+        shinySprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.SHINY_SPRITES);
 
         bodyRenderer = transform.Find("RobotBody").GetComponent<SpriteRenderer>();
         legRenderer = transform.Find("RobotLegs").GetComponent<SpriteRenderer>();
+        wireRenderer = transform.Find("RobotWires").GetComponent<SpriteRenderer>();
+        shinyRenderer = transform.Find("RobotShiny").GetComponent<SpriteRenderer>();
+
 
         SpriteManager.InitColorSwapTex(out colorSwapTex, out spriteColors, bodySprites[0].texture);
         bodyRenderer.material.SetTexture("_SwapTex", colorSwapTex);
         legRenderer.material.SetTexture("_SwapTex", colorSwapTex);
+        wireRenderer.material.SetTexture("_SwapTex", colorSwapTex);
+        shinyRenderer.material.SetTexture("_SwapTex", colorSwapTex);
 
         //DO SWAP
-        SwapColor(SwapIndex.WireA, new Color(Random.Range(0, 1), Random.Range(0, 1), Random.Range(0, 1)));
-        SwapColor(SwapIndex.WireB, new Color(Random.Range(0, 1), Random.Range(0, 1), Random.Range(0, 1)));
+        SwapColor(SwapIndex.WireA, new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f)));
+        SwapColor(SwapIndex.WireB, new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f)));
 
         Vector3 metalOffset = new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f));
         Color glowOffset = new Color(Random.Range(0.4f, 0.8f), Random.Range(0.4f, 0.8f), Random.Range(0.4f, 0.8f));
@@ -142,6 +158,7 @@ public class CharacterController2D : MonoBehaviour
         colorSwapTex.Apply();
 
         legFrameTimer = LegFrameInterval;
+        wireFrameTimer = WireFrameInterval;
 
         myHPBar.UpdateHP(hitpoints);
     }
@@ -170,17 +187,20 @@ public class CharacterController2D : MonoBehaviour
                         
                         // create laser
                         GameObject newLaser = Instantiate(laserPrefab);
-                        newLaser.transform.position = Vector3.zero;
-                        LineRenderer lineRenderer = newLaser.GetComponent<LineRenderer>();
-                        lineRenderer.SetPosition(0, new Vector2(transform.position.x, transform.position.y));
-                        lineRenderer.SetPosition(1, hit.point);
-                        lineRenderer.startWidth = lineRenderer.endWidth = 0.1f + attackCharge*0.5f;
+                        newLaser.transform.position = new Vector2(transform.position.x, transform.position.y);
+                        SpriteRenderer sr = newLaser.GetComponent<SpriteRenderer>();
+                        newLaser.transform.Rotate(Vector3.forward, Mathf.Tan(attackDir.y / attackDir.x) * 180 / Mathf.PI + (attackDir.x < 0 ? 180 : 0));
+                        sr.size = new Vector2(hit.distance, 1);
+                        DespawnAnimation dAnim = newLaser.GetComponent<DespawnAnimation>();
+                        dAnim.FrameTimer = 0.5f;
+                        dAnim.spriteList = SpriteManager.instance.GetModifiedSprites(SpriteManager.LASER_SPRITES);
+                        dAnim.spriteIndex = dAnim.spriteList.Count - 1;
 
                         // deal damage to player
                         CharacterController2D otherPlayer = hit.collider.GetComponent<CharacterController2D>();
                         if (otherPlayer != null)
                         {
-                            otherPlayer.LaserHit(attackCharge);
+                            otherPlayer.Hit(attackCharge);
                         }
 
                         //Debug.Log(hit.collider.gameObject.name);
@@ -254,8 +274,38 @@ public class CharacterController2D : MonoBehaviour
                 legFrameTimer += LegFrameInterval;
                 legIndex = ++legIndex % legSprites.Count;
             }
+
+            wireFrameTimer -= Time.deltaTime; // double up on wire frame time when walking
         }
         else if (stopWalkNoise == false) { GameLogic.instance.soundGenerator.StopWalkSound(); stopWalkNoise = true; }
+
+        wireFrameTimer -= Time.deltaTime;
+        if (wireFrameTimer <= 0)
+        {
+            wireFrameTimer += WireFrameInterval;
+            wireIndex = ++wireIndex % wireSprites.Count;
+        }
+
+        shinyRenderer.gameObject.SetActive(false);
+        if (hitpoints == MAX_HP)
+        {
+            shinyTimer -= Time.deltaTime;
+
+            if (shinyTimer <= 0)
+            {
+                shinyIndex = Mathf.FloorToInt(Mathf.Abs(shinyTimer) * 16);
+
+                if (shinyIndex >= shinySprites.Count)
+                {
+                    shinyTimer = Random.Range(2f, 3f);
+                }
+                else
+                {
+                    shinyRenderer.sprite = shinySprites[shinyIndex];
+                    shinyRenderer.gameObject.SetActive(true);
+                }
+            }
+        }
 
         velocity.Normalize();
         robot.AddForce(velocity, ForceMode2D.Impulse);
@@ -270,6 +320,15 @@ public class CharacterController2D : MonoBehaviour
 
         bodyRenderer.sprite = bodySprites[bodyIndex];
         legRenderer.sprite = legSprites[legIndex];
+        wireRenderer.sprite = wireSprites[wireIndex];
+        wireRenderer.gameObject.SetActive(bodyIndex >= bodySprites.Count - 2);
+
+        Vector3 scale = Vector3.one;
+        scale.x = moveDir.x < 0 ? -1 : 1;
+        bodyRenderer.transform.localScale = scale;
+        legRenderer.transform.localScale = scale;
+        wireRenderer.transform.localScale = scale;
+        shinyRenderer.transform.localScale = scale;
     }
 
     public void ControllerAction(string ID, JToken data)
@@ -321,16 +380,12 @@ public class CharacterController2D : MonoBehaviour
             {
                 // first hit other than me
 
-                // create laser
-                GameObject newMelee = Instantiate(meleePrefab);
-                newMelee.transform.position = hit.point;
-                newMelee.transform.localScale = Vector3.one * 4 * hit.distance;
-
                 // deal damage to player
                 CharacterController2D otherPlayer = hit.collider.GetComponent<CharacterController2D>();
                 if (otherPlayer != null)
                 {
                     didHit = true;
+                    otherPlayer.Hit(3);
 
                     if (otherPlayer.hitpoints == 0)
                     {
@@ -345,20 +400,24 @@ public class CharacterController2D : MonoBehaviour
             }
         }
 
-        if (!didHit)
-        {
-            GameObject newMelee = Instantiate(meleeMissPrefab);
-            newMelee.transform.position = transform.position + new Vector3(moveDir.x, moveDir.y);
-        }
+        // create melee
+        GameObject newMelee = Instantiate(meleePrefab);
+        newMelee.transform.position = transform.position + (Vector3)moveDir.normalized*0.5f;
+        newMelee.transform.localScale = Vector3.one;
+        newMelee.transform.Rotate(new Vector3(0, 0, Mathf.Tan(moveDir.normalized.y / moveDir.normalized.x) * 180 / Mathf.PI + (moveDir.normalized.x < 0 ? 180 : 0)));
+        DespawnAnimation dAnim = newMelee.GetComponent<DespawnAnimation>();
+        dAnim.spriteList = SpriteManager.instance.GetModifiedSprites(SpriteManager.MELEE_SPRITES);
+        dAnim.incrementIndex = true;
+        dAnim.FrameTimer = 1 / 20f;
 
         GameLogic.instance.soundGenerator.AddSwordSound();
     }
 
-    public void LaserHit(float laserPower)
+    public void Hit(float laserPower)
     {
         int pointsLost = Mathf.CeilToInt(laserPower);
 
-        if (hitpoints > 0)
+        if (hitpoints > 0 && Random.Range(0f, 1f) < 0.45f)
         {
             for (int i = 0; i < pointsLost; i++)
             {
