@@ -45,6 +45,34 @@ public class GameLogic : MonoBehaviour
         players[deviceID] = newPlayer.GetComponent<CharacterController2D>();
         players[deviceID].playerID = deviceID;
         newPlayer.transform.position = new Vector3(Random.Range(-10, 10), Random.Range(-6, 6));
+
+        string playerName = ((char)('A' + Random.Range(0, 24))).ToString() + Random.Range(0, 9) + ((char)('A' + Random.Range(0, 24))).ToString() + Random.Range(0, 9);
+        players[deviceID].playerTag = playerName;
+
+        AirConsole.instance.SetCustomDeviceStateProperty("playerTags", UpdatePlayerTagData(AirConsole.instance.GetCustomDeviceState(0), deviceID, playerName));
+    }
+
+    public static JToken UpdatePlayerTagData(JToken oldGameState, int deviceId, string colorName)
+    {
+
+        //take out the existing playerColorData and store it as a JObject so I can modify it
+        JObject playerTagData = oldGameState["playerTags"] as JObject;
+
+        //check if the playerColorData object within the game state already has data for this device
+        if (playerTagData.HasValues && playerTagData[deviceId.ToString()] != null)
+        {
+            //there is already color data for this device, replace it
+            playerTagData[deviceId.ToString()] = colorName;
+        }
+        else
+        {
+            playerTagData.Add(deviceId.ToString(), colorName);
+            //there is no color data for this device yet, create it new
+        }
+
+        //logging and returning the updated playerColorData
+        Debug.Log("UpdatePlayerTagData for device " + deviceId + " returning new playerTagData: " + playerTagData);
+        return playerTagData;
     }
 
     public CharacterController2D GetPlayerByID(int deviceID)
@@ -58,7 +86,11 @@ public class GameLogic : MonoBehaviour
 
     void OnReady(string code)
     {
-        
+        //Initialize Game State
+        JObject newGameState = new JObject();
+        newGameState.Add("playerTags", new JObject());
+
+        AirConsole.instance.SetCustomDeviceState(newGameState);
     }
 
     void OnMessage(int from, JToken data)
