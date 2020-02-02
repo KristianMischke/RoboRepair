@@ -31,6 +31,8 @@ public class CharacterController2D : MonoBehaviour
     // Attack params
     [SerializeField]
     private float meleeDistance = 2f;
+    private float meleeAttackTimer = 0;
+    private float meleeAttackDelay { get { return 0.8f; } }
     [SerializeField, Tooltip("amount of charge gained per second")]
     private float attackChargeRate = 0.5f;
     [SerializeField]
@@ -353,6 +355,9 @@ public class CharacterController2D : MonoBehaviour
                 isBlinking = false;
             }
         }
+
+        if (meleeAttackTimer > 0f)
+            meleeAttackTimer -= Time.deltaTime;
     }
 
     public void ControllerAction(string ID, JToken data)
@@ -395,6 +400,11 @@ public class CharacterController2D : MonoBehaviour
 
     private void DoMelee()
     {
+        if (meleeAttackTimer > 0f)
+            return;
+
+        meleeAttackTimer = meleeAttackDelay;
+
         RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, moveDir, meleeDistance);
 
         bool didHit = false;
