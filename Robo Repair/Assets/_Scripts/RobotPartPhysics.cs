@@ -17,12 +17,13 @@ public class RobotPartPhysics : MonoBehaviour
 
     private bool addedForce = false;
 
-    public int playerID;
+    public int playerID = -2;
 
     // Update is called once per frame
     void Update()
     {
         if (!addedForce) {
+            Debug.Log("Piece Spawned" + playerID);
             float intensity = Random.Range(0.1f, 1f);
 
             robotPart.AddForce(new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized * intensity, ForceMode2D.Impulse);
@@ -33,6 +34,10 @@ public class RobotPartPhysics : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
+        if (playerID == -2)
+        {
+            return;
+        }
         //Debug.Log("AAAAAAAAAAAAA");
         CharacterController2D otherPlayer = collision.GetComponent<CharacterController2D>();
 
@@ -43,7 +48,8 @@ public class RobotPartPhysics : MonoBehaviour
             if (otherPlayerID != playerID) {
                 //Debug.Log("Did it");
                 otherPlayer.Heal();
-                this.gameObject.SetActive(false);
+                //this.gameObject.SetActive(false);
+                Destroy(transform.parent.gameObject);
             }
         }
     }

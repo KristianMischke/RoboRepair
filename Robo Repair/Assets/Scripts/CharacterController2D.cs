@@ -227,7 +227,7 @@ public class CharacterController2D : MonoBehaviour
 
                 foreach (RaycastHit2D hit in hits)
                 {
-                    if (hit.collider.gameObject != this.gameObject && hit.collider.GetComponent<RobotPartPhysics>() == null)
+                    if (hit.collider.gameObject != this.gameObject && hit.collider.GetComponent<RobotPartPhysics>() == null && hit.collider.GetComponent<MagnetCollider>() == null)
                     {
                         // first hit other than me
                         
@@ -477,8 +477,9 @@ public class CharacterController2D : MonoBehaviour
                 robotPart.transform.position = transform.position;
                 SpriteRenderer sr = robotPart.GetComponent<SpriteRenderer>();
                 sr.sprite = partSprites[Random.Range(0, partSprites.Count)];
+
                 sr.material.SetTexture("_SwapTex", mainColorSwapTex);
-                robotPart.GetComponent<RobotPartPhysics>().playerID = this.playerID;
+                robotPart.GetComponentInChildren<RobotPartPhysics>().playerID = this.playerID;
             }
         }
 
