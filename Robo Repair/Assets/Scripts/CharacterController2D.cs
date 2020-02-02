@@ -189,12 +189,13 @@ public class CharacterController2D : MonoBehaviour
                         GameObject newLaser = Instantiate(laserPrefab);
                         newLaser.transform.position = new Vector2(transform.position.x, transform.position.y);
                         SpriteRenderer sr = newLaser.GetComponent<SpriteRenderer>();
-                        newLaser.transform.Rotate(Vector3.forward, Mathf.Tan(attackDir.y / attackDir.x) * 180 / Mathf.PI + (attackDir.x < 0 ? 180 : 0));
+                        newLaser.transform.Rotate(Vector3.forward, Vector2.SignedAngle(Vector2.right, attackDir.normalized));
                         sr.size = new Vector2(hit.distance, 1);
                         DespawnAnimation dAnim = newLaser.GetComponent<DespawnAnimation>();
-                        dAnim.FrameTimer = 0.5f;
+                        dAnim.incrementIndex = false;
+                        dAnim.FrameTimer = 0.2f;
                         dAnim.spriteList = SpriteManager.instance.GetModifiedSprites(SpriteManager.LASER_SPRITES);
-                        dAnim.spriteIndex = dAnim.spriteList.Count - 1;
+                        dAnim.spriteIndex = Mathf.FloorToInt(attackCharge/attackMaxCharge*dAnim.spriteList.Count);
 
                         // deal damage to player
                         CharacterController2D otherPlayer = hit.collider.GetComponent<CharacterController2D>();
@@ -404,7 +405,7 @@ public class CharacterController2D : MonoBehaviour
         GameObject newMelee = Instantiate(meleePrefab);
         newMelee.transform.position = transform.position + (Vector3)moveDir.normalized*0.5f;
         newMelee.transform.localScale = Vector3.one;
-        newMelee.transform.Rotate(new Vector3(0, 0, Mathf.Tan(moveDir.normalized.y / moveDir.normalized.x) * 180 / Mathf.PI + (moveDir.normalized.x < 0 ? 180 : 0)));
+        newMelee.transform.Rotate(new Vector3(0, 0, Vector2.SignedAngle(Vector2.right, moveDir.normalized)));
         DespawnAnimation dAnim = newMelee.GetComponent<DespawnAnimation>();
         dAnim.spriteList = SpriteManager.instance.GetModifiedSprites(SpriteManager.MELEE_SPRITES);
         dAnim.incrementIndex = true;

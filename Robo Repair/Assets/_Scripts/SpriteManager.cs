@@ -44,7 +44,7 @@ public class SpriteManager : MonoBehaviour
         new SpriteVector(ROBOT_SPRITES + "0", new Vector2Int(0, 1), 7, DEFAULT_PIVOT),
         new SpriteVector(ROBOT_SPRITES + "1", new Vector2Int(0, 2), 7, DEFAULT_PIVOT),
         new SpriteVector(ROBOT_SPRITES + "2", new Vector2Int(0, 3), 7, DEFAULT_PIVOT),
-        new SpriteVector(PART_SPRITES, new Vector2Int(0, 4), 5, DEFAULT_PIVOT),
+        new SpriteVector(PART_SPRITES, new Vector2Int(0, 4), 11, DEFAULT_PIVOT),
         new SpriteVector(LASER_SPRITES, new Vector2Int(0, 5), 7, new Vector2(0, 0.5f)),
         new SpriteVector(MELEE_SPRITES, new Vector2Int(0, 6), 6, DEFAULT_PIVOT),
         new SpriteVector(WIRE_SPRITES, new Vector2Int(0, 7), 4, DEFAULT_PIVOT),
