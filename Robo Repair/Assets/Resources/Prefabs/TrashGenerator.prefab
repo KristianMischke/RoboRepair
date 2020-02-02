@@ -47,10 +47,11 @@ MonoBehaviour:
   bottom: {fileID: 0}
   left: {fileID: 0}
   right: {fileID: 0}
-  myPrefab:
+  myPrefabs:
   - {fileID: 2405391955370722358, guid: d7e10217ad0dfb74eb00ae458bc7a25d, type: 3}
   - {fileID: 2405391955370722358, guid: 6b51d9af29db14b43af8c638021016f9, type: 3}
   - {fileID: 2405391955370722358, guid: 484f659bc28bb8d4fa7e1fc3bbdb6dec, type: 3}
+  - {fileID: 2405391955370722358, guid: d1cb077d7c231914baae9c32a0aadf5e, type: 3}
   trashSpriteRenderer: {fileID: 7632937967713978460, guid: d7e10217ad0dfb74eb00ae458bc7a25d,
     type: 3}
   trashSprites:
@@ -74,3 +75,16 @@ MonoBehaviour:
   - {fileID: 3912554482014063563, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
   - {fileID: -5970157769536964832, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
   - {fileID: 289909530908896649, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  smallTrashSpriteRenderer: {fileID: 7632937967713978460, guid: d1cb077d7c231914baae9c32a0aadf5e,
+    type: 3}
+  smallTrashSprites:
+  - {fileID: -942494204440328609, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  - {fileID: 1603184614873367213, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  edgeBoundaryModifier: 2
+  spawnRanges:
+  - {x: 2, y: 6}
+  - {x: 7, y: 11}
+  - {x: 4, y: 7}
+  - {x: 4, y: 7}
+  clumpingArea: {x: 0.5, y: 0.5}
+  numberClumped: 3

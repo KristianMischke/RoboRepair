@@ -374,6 +374,8 @@ MonoBehaviour:
   testWithKeyboard: 0
   partPrefab: {fileID: 8529297972950783182, guid: 96c6394b6ef8b44f29c50a8f5ce39e90,
     type: 3}
+  dustPrefab: {fileID: 8986063531190664085, guid: 5f3433c58ce18d043bca0564ea572798,
+    type: 3}
   robot: {fileID: 6324917998766935747}
   meleeDistance: 2
   attackChargeRate: 2
@@ -699,7 +701,7 @@ LineRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 9
   m_Positions:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 1}
