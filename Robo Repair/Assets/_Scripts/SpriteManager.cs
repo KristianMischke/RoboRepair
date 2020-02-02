@@ -17,6 +17,9 @@ public class SpriteManager : MonoBehaviour
     public const string MELEE_SPRITES = "melee";
     public const string SHINY_SPRITES = "shiny";
     public const string CHARGE_SPRITES = "charge";
+    public const string GROUND_SPRITES = "ground";
+    public const string DIRT_FLEKS = "dirt";
+    public const string WALK_DUST_SPRITES = "dust";
 
     public static SpriteManager instance;
 
@@ -50,7 +53,10 @@ public class SpriteManager : MonoBehaviour
         new SpriteVector(MELEE_SPRITES, new Vector2Int(0, 6), 6, DEFAULT_PIVOT, "Art/Indexed Robot"),
         new SpriteVector(WIRE_SPRITES, new Vector2Int(0, 7), 4, DEFAULT_PIVOT, "Art/Indexed Robot"),
         new SpriteVector(SHINY_SPRITES, new Vector2Int(0, 8), 11, DEFAULT_PIVOT, "Art/Indexed Robot"),
-        new SpriteVector(CHARGE_SPRITES, Vector2Int.zero, 10, DEFAULT_PIVOT, "Art/Charge")
+        new SpriteVector(CHARGE_SPRITES, Vector2Int.zero, 10, DEFAULT_PIVOT, "Art/Charge"),
+        new SpriteVector(GROUND_SPRITES, Vector2Int.zero, 5, DEFAULT_PIVOT, "Art/Ground"),
+        new SpriteVector(DIRT_FLEKS, new Vector2Int(0, 1), 5, DEFAULT_PIVOT, "Art/Ground"),
+        new SpriteVector(WALK_DUST_SPRITES, new Vector2Int(0, 2), 5, DEFAULT_PIVOT, "Art/Ground")
     };
 
     private Dictionary<string, List<Sprite>> spriteDictionary = null;
