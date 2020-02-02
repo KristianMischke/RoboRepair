@@ -437,6 +437,7 @@ MonoBehaviour:
   meleeMissPrefab: {fileID: 9035713702920828509, guid: 18647c5a1cb34224eb477ae86f5484d1,
     type: 3}
   playerID: -1
+  playerTag: 
   myHPBar: {fileID: 3466416449729456961}
   myText: {fileID: 5415205245083517801}
 --- !u!1 &6324917999366543464
@@ -844,7 +845,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -963.17017, y: -541.3015}
+  m_AnchoredPosition: {x: -962.6559, y: -541.3396}
   m_SizeDelta: {x: 2.277, y: 0.635}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1233245113284711648

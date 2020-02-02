@@ -81,11 +81,11 @@
                }
 
                //check if there's any player color data
-               if (device_data["playerColors"] != null) {
+               if (device_data["playerTags"] != null) {
                   //check the CustomDeviceStateChange data contains any playerColorData for this particular device
-                  if (device_data["playerColors"][me.airconsole.getDeviceId()]) {
+                  if (device_data["playerTags"][me.airconsole.getDeviceId()]) {
                      //this works for named colors. If you want to use colors that don't have a name, you could pass a hex code instead of a string/name
-                     document.getElementById("background").style.backgroundColor = device_data["playerColors"][me.airconsole.getDeviceId()];
+                     document.getElementById("playercode").innerText = device_data["playerTags"][me.airconsole.getDeviceId()];
                   }
                }
             }
@@ -122,13 +122,30 @@
    <body onload="window.app = new App()">
 
       <div style="position:absolute;z-index:30;width:100%;height:100%;background-image:url(WebArt/Title.png);background-repeat: no-repeat;background-size: 25%;background-position: center bottom;pointer-events: none;"></div>
+      <div style="
+      position: absolute;
+      width: 100%;
+      z-index: 30;">
+         <p id="playercode" style="
+         font-size: 48;
+         margin: 0;
+         padding: 40;
+         text-align: center;
+         color: #310909;
+         font-family: consolas;">R2D2</p>
+      </div>
 
       <div id="background"></div>
-      <div class="gamepad_container">
+      <div id="view-0" class="gamepad_container view">
          <div id="left" class="left"></div>
-         <div id="middle" class="middle">
-         </div>
+         <div id="middle" class="middle"></div>
          <div id="right" class="right"></div>
+       </div>
+       <div id="view-1" class="view" style="background-color: #AF8B77;">
+         <form action="/action_page.php">
+            <img src="https://i.ya-webdesign.com/images/male-head-silhouette-png-2.png" style="width:30%"><input type="text" name="nametag" style="width: 50%; height: 60;"><br>
+            <input type="submit" value="" style="background-image: url(https://upload.wikimedia.org/wikipedia/commons/9/9a/Yellow_check.svg);width: 20%;height: 60;background-size: 20%;background-repeat: no-repeat;background-position: center;background-color: black;border-color: gold;">
+          </form>
        </div>
      
    

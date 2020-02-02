@@ -59,6 +59,7 @@ public class CharacterController2D : MonoBehaviour
     
     // health/gamelogic
     public int playerID = -1;
+    public string playerTag;
 
     int hitpoints = 12;
     public const int MAX_HP = 20;
@@ -217,7 +218,7 @@ public class CharacterController2D : MonoBehaviour
 
         //myText.text = "Player " + playerID;
 
-        myText.SetText("Player " + playerID);
+        myText.SetText(playerTag);
     }
 
     private void Update()
@@ -234,7 +235,7 @@ public class CharacterController2D : MonoBehaviour
             crosshair.SetPosition(1, transform.position + (Vector3)attackDir.normalized * 1f);
             crosshair.startWidth = crosshair.endWidth = Mathf.Clamp01(attackCharge / attackMaxCharge) * 0.3f;
 
-            chargeRenderer.sprite = chargeSprites[Mathf.FloorToInt(Mathf.Clamp01(attackCharge / attackMaxCharge) * (chargeSprites.Count - 1))];
+            chargeRenderer.sprite = chargeSprites[Mathf.FloorToInt(Mathf.Clamp01(attackCharge / attackMaxCharge) * (chargeSprites.Count - 4))];
         }
         else
         {
@@ -262,6 +263,15 @@ public class CharacterController2D : MonoBehaviour
                         dAnim.FrameTimer = 0.2f;
                         dAnim.spriteList = SpriteManager.instance.GetModifiedSprites(SpriteManager.LASER_SPRITES);
                         dAnim.spriteIndex = Mathf.FloorToInt(Mathf.Clamp01(attackCharge/attackMaxCharge) * (dAnim.spriteList.Count-1));
+
+                        GameObject chargePuff = Instantiate(chargeRenderer.gameObject, transform);
+                        chargePuff.SetActive(true);
+                        chargePuff.GetComponent<SpriteRenderer>().sortingOrder = 20;
+                        DespawnAnimation dAnim2 = chargePuff.AddComponent(typeof(DespawnAnimation)) as DespawnAnimation;
+                        dAnim2.incrementIndex = true;
+                        dAnim2.FrameTimer = 0.07f;
+                        dAnim2.spriteList = chargeSprites;
+                        dAnim2.spriteIndex = 7;
 
                         // deal damage to player
                         CharacterController2D otherPlayer = hit.collider.GetComponent<CharacterController2D>();

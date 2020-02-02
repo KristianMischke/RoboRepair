@@ -19,16 +19,20 @@ public class TileGenerator : MonoBehaviour
         List<Sprite> dirtFleks = SpriteManager.instance.GetModifiedSprites(SpriteManager.DIRT_FLEKS);
 
         bool[,] edges = new bool[numTilesAcross, numTilesDown];
-        for (int i = 1; i < numTilesAcross-1; i++)
+        for (int i = 0; i < numTilesAcross; i++)
         {
-            for (int j = 1; j < numTilesDown-1; j++)
+            for (int j = 0; j < numTilesDown; j++)
             {
-                if (Random.Range(0, 1f) < 0.3f)
+                if (i == 0 || j == 0 || i == numTilesAcross || j == numTilesDown)
+                {
+                    edges[i, j] = true;
+                }
+                /*if (Random.Range(0, 1f) < 0.3f)
                 {
                     for (int x = -1; x <= 1; x++)
                         for (int y = -1; y <= 1; y++)
                             edges[i + x, j + y] = true;
-                }
+                }*/
             }
         }
 
