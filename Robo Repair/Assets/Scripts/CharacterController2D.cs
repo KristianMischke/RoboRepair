@@ -363,6 +363,7 @@ public class CharacterController2D : MonoBehaviour
         bodyIndex = Mathf.Clamp(bodySprites.Count - Mathf.RoundToInt(bodySprites.Count * ((float)hitpoints / MAX_HP)), 0, bodySprites.Count-1);
 
         bodyRenderer.sprite = bodySprites[bodyIndex];
+        shinyRenderer.GetComponent<SpriteMask>().sprite = bodySprites[bodyIndex];
         legRenderer.sprite = legSprites[legIndex];
         wireRenderer.sprite = wireSprites[wireIndex];
         wireRenderer.gameObject.SetActive(bodyIndex >= bodySprites.Count - 2);
