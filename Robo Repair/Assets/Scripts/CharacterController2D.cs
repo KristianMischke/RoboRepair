@@ -68,6 +68,7 @@ public class CharacterController2D : MonoBehaviour
     List<Sprite> wireSprites;
     List<Sprite> partSprites;
     List<Sprite> shinySprites;
+    List<Sprite> chargeSprites;
     int bodyIndex;
     int legIndex;
     int wireIndex;
@@ -136,6 +137,7 @@ public class CharacterController2D : MonoBehaviour
         wireSprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.WIRE_SPRITES);
         partSprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.PART_SPRITES);
         shinySprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.SHINY_SPRITES);
+        chargeSprites = SpriteManager.instance.GetModifiedSprites(SpriteManager.CHARGE_SPRITES);
 
         bodyRenderer = transform.Find("RobotBody").GetComponent<SpriteRenderer>();
         legRenderer = transform.Find("RobotLegs").GetComponent<SpriteRenderer>();
@@ -188,6 +190,7 @@ public class CharacterController2D : MonoBehaviour
                 if (i == SwapIndex.Glow4)
                 {
                     crosshair.startColor = newColor;
+                    chargeRenderer.material.color = newColor;
                 }
                 if (i == SwapIndex.Glow0)
                 {
@@ -208,6 +211,7 @@ public class CharacterController2D : MonoBehaviour
     {
 
         crosshair.enabled = attackPressed;
+        chargeRenderer.gameObject.SetActive(attackPressed);
         // charge attack
         if (attackPressed)
         {
@@ -215,7 +219,9 @@ public class CharacterController2D : MonoBehaviour
 
             crosshair.SetPosition(0, transform.position + (Vector3)attackDir.normalized * 0.4f);
             crosshair.SetPosition(1, transform.position + (Vector3)attackDir.normalized * 1f);
-            crosshair.startWidth = crosshair.endWidth = 0.05f;
+            crosshair.startWidth = crosshair.endWidth = Mathf.Clamp01(attackCharge / attackMaxCharge) * 0.3f;
+
+            chargeRenderer.sprite = chargeSprites[Mathf.FloorToInt(Mathf.Clamp01(attackCharge / attackMaxCharge) * (chargeSprites.Count - 1))];
         }
         else
         {
@@ -242,7 +248,7 @@ public class CharacterController2D : MonoBehaviour
                         dAnim.incrementIndex = false;
                         dAnim.FrameTimer = 0.2f;
                         dAnim.spriteList = SpriteManager.instance.GetModifiedSprites(SpriteManager.LASER_SPRITES);
-                        dAnim.spriteIndex = Mathf.FloorToInt(Mathf.Clamp01(attackCharge/attackMaxCharge)* (dAnim.spriteList.Count-1));
+                        dAnim.spriteIndex = Mathf.FloorToInt(Mathf.Clamp01(attackCharge/attackMaxCharge) * (dAnim.spriteList.Count-1));
 
                         // deal damage to player
                         CharacterController2D otherPlayer = hit.collider.GetComponent<CharacterController2D>();
