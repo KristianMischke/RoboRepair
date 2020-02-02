@@ -101,9 +101,9 @@ public class SpriteManager : MonoBehaviour
     }
 
     // Thanks to https://gamedevelopment.tutsplus.com/tutorials/how-to-use-a-shader-to-dynamically-swap-a-sprites-colors--cms-25129
-    public static void InitColorSwapTex(out Texture2D mColorSwapTex, out Color[] mSpriteColors, Texture2D refTexture = null)
+    public static void InitColorSwapTex(out Texture2D colorSwapTex, out Color[] mSpriteColors, Texture2D refTexture = null)
     {
-        Texture2D colorSwapTex = new Texture2D(256, 1, TextureFormat.RGBA32, false, false);
+        colorSwapTex = new Texture2D(256, 1, TextureFormat.RGBA32, false, false);
         colorSwapTex.filterMode = FilterMode.Point;
 
         for (int i = 0; i < colorSwapTex.width; ++i)
@@ -112,14 +112,16 @@ public class SpriteManager : MonoBehaviour
         colorSwapTex.Apply();
 
         mSpriteColors = new Color[colorSwapTex.width];
-        mColorSwapTex = colorSwapTex;
 
         if (refTexture != null)
         {
             foreach(Color32 c in refTexture.GetPixels())
             {
-                colorSwapTex.SetPixel(c.r, 0, c);
-                mSpriteColors[c.r] = c;
+                if (c.a != 0)
+                {
+                    colorSwapTex.SetPixel(c.r, 0, c);
+                    mSpriteColors[c.r] = c;
+                }
             }
         }
     }
