@@ -76,6 +76,8 @@ public class CharacterController2D : MonoBehaviour
     SpriteRenderer legRenderer;
     SpriteRenderer wireRenderer;
     SpriteRenderer shinyRenderer;
+    SpriteRenderer chargeRenderer;
+    LineRenderer crosshair;
     float legFrameTimer = 0;
     float wireFrameTimer = 0;
     float shinyTimer = 0;
@@ -139,10 +141,12 @@ public class CharacterController2D : MonoBehaviour
         legRenderer = transform.Find("RobotLegs").GetComponent<SpriteRenderer>();
         wireRenderer = transform.Find("RobotWires").GetComponent<SpriteRenderer>();
         shinyRenderer = transform.Find("RobotShiny").GetComponent<SpriteRenderer>();
+        chargeRenderer = transform.Find("ChargeFlare").GetComponent<SpriteRenderer>();
+        crosshair = transform.Find("Crosshair").GetComponent<LineRenderer>();
 
 
         SpriteManager.InitColorSwapTex(out mainColorSwapTex, out spriteColors, bodySprites[0].texture);
-        justRobotSwapTex = new Texture2D(256, 1, TextureFormat.RGBA32, false, false);
+        SpriteManager.InitColorSwapTex(out justRobotSwapTex, out _, bodySprites[0].texture);
         bodyRenderer.material.SetTexture("_SwapTex", justRobotSwapTex);
         legRenderer.material.SetTexture("_SwapTex", justRobotSwapTex);
         wireRenderer.material.SetTexture("_SwapTex", justRobotSwapTex);
@@ -152,12 +156,12 @@ public class CharacterController2D : MonoBehaviour
         SwapColor(SwapIndex.WireA, new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f)));
         SwapColor(SwapIndex.WireB, new Color(Random.Range(0, 1f), Random.Range(0, 1f), Random.Range(0, 1f)));
 
-        float metalOffset = Random.Range(-1f, 1f);
-        float glowOffset = Random.Range(-1f, 1f);
+        float metalHue = Random.Range(0f, 1f);
+        float glowHue = Random.Range(0f, 1f);
         
         for (SwapIndex i = 0; i < (SwapIndex)256; i++)
         {
-            Color refColor = mainColorSwapTex.GetPixel((int)i, 0);
+            Color refColor = spriteColors[(int)i];
             if (i == SwapIndex.Metal0
                 || i == SwapIndex.Metal1
                 || i == SwapIndex.Metal2
@@ -166,7 +170,7 @@ public class CharacterController2D : MonoBehaviour
                 || i == SwapIndex.Metal5)
             {
                 Color.RGBToHSV(refColor, out float H, out float S, out float V);
-                H += metalOffset;
+                H = metalHue;
                 Color newColor = Color.HSVToRGB(H, S, V);
                 SwapColor(i, newColor);
             }
@@ -174,12 +178,21 @@ public class CharacterController2D : MonoBehaviour
                 || i == SwapIndex.Glow1
                 || i == SwapIndex.Glow2
                 || i == SwapIndex.Glow3
-                || i == SwapIndex.Glow3)
+                || i == SwapIndex.Glow4)
             {
                 Color.RGBToHSV(refColor, out float H, out float S, out float V);
-                H += glowOffset;
+                H = glowHue;
                 Color newColor = Color.HSVToRGB(H, S, V);
                 SwapColor(i, newColor);
+
+                if (i == SwapIndex.Glow4)
+                {
+                    crosshair.startColor = newColor;
+                }
+                if (i == SwapIndex.Glow0)
+                {
+                    crosshair.endColor = newColor;
+                }
             }
         }
         mainColorSwapTex.Apply();
@@ -194,10 +207,15 @@ public class CharacterController2D : MonoBehaviour
     private void Update()
     {
 
+        crosshair.enabled = attackPressed;
         // charge attack
         if (attackPressed)
         {
             attackCharge = Mathf.Min(attackCharge + Time.deltaTime * attackChargeRate, attackMaxCharge);
+
+            crosshair.SetPosition(0, transform.position + (Vector3)attackDir.normalized * 0.4f);
+            crosshair.SetPosition(1, transform.position + (Vector3)attackDir.normalized * 1f);
+            crosshair.startWidth = crosshair.endWidth = 0.05f;
         }
         else
         {
@@ -224,7 +242,7 @@ public class CharacterController2D : MonoBehaviour
                         dAnim.incrementIndex = false;
                         dAnim.FrameTimer = 0.2f;
                         dAnim.spriteList = SpriteManager.instance.GetModifiedSprites(SpriteManager.LASER_SPRITES);
-                        dAnim.spriteIndex = Mathf.FloorToInt(attackCharge/attackMaxCharge*dAnim.spriteList.Count);
+                        dAnim.spriteIndex = Mathf.FloorToInt(Mathf.Clamp01(attackCharge/attackMaxCharge)* (dAnim.spriteList.Count-1));
 
                         // deal damage to player
                         CharacterController2D otherPlayer = hit.collider.GetComponent<CharacterController2D>();

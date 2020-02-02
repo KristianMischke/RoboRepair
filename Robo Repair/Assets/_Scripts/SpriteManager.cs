@@ -109,8 +109,6 @@ public class SpriteManager : MonoBehaviour
         for (int i = 0; i < colorSwapTex.width; ++i)
             colorSwapTex.SetPixel(i, 0, new Color(0.0f, 0.0f, 0.0f, 0.0f));
 
-        colorSwapTex.Apply();
-
         mSpriteColors = new Color[colorSwapTex.width];
 
         if (refTexture != null)
@@ -124,5 +122,7 @@ public class SpriteManager : MonoBehaviour
                 }
             }
         }
+
+        colorSwapTex.Apply();
     }
 }
