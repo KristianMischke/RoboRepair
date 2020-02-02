@@ -21,6 +21,9 @@ public class CharacterController2D : MonoBehaviour
     [SerializeField]
     public GameObject partPrefab;
 
+    [SerializeField]
+    public GameObject dustPrefab;
+
     public Rigidbody2D robot;
 
     // Movement params
@@ -302,6 +305,17 @@ public class CharacterController2D : MonoBehaviour
             {
                 legFrameTimer += LegFrameInterval;
                 legIndex = ++legIndex % legSprites.Count;
+            }
+
+            if (legIndex == 0 || legIndex == 5)
+            {
+                GameObject dust = Instantiate(dustPrefab, GameLogic.instance.playerParentTransform);
+                dust.transform.position = transform.position + new Vector3(legIndex == 0 ? -0.45f : 0.45f, -0.35f);
+                DespawnAnimation dAnim = dust.GetComponent<DespawnAnimation>();
+                dAnim.spriteList = SpriteManager.instance.GetModifiedSprites(SpriteManager.WALK_DUST_SPRITES);
+                dAnim.incrementIndex = true;
+                dAnim.spriteIndex = 0;
+                dAnim.FrameTimer = 0.3f;
             }
 
             wireFrameTimer -= Time.deltaTime; // double up on wire frame time when walking
