@@ -44,6 +44,7 @@ public class GameLogic : MonoBehaviour
         newPlayer.name = "Player" + deviceID;
         players[deviceID] = newPlayer.GetComponent<CharacterController2D>();
         players[deviceID].playerID = deviceID;
+        newPlayer.transform.position = new Vector3(Random.Range(-10, 10), Random.Range(-6, 6));
     }
 
     public CharacterController2D GetPlayerByID(int deviceID)

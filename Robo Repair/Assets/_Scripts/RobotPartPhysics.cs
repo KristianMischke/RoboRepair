@@ -23,7 +23,8 @@ public class RobotPartPhysics : MonoBehaviour
     void Update()
     {
         if (!addedForce) {
-            robotPart.AddForce(new Vector2(1f, 0f), ForceMode2D.Impulse);
+            robotPart.AddForce(new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized, ForceMode2D.Impulse);
+            robotPart.AddTorque(Random.Range(-1f, 1f));
             addedForce = true;
         }
     }

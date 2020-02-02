@@ -21,9 +21,6 @@ public class CharacterController2D : MonoBehaviour
     [SerializeField]
     public GameObject partPrefab;
 
-    [SerializeField]
-    public Transform partParentTransform;
-
     public Rigidbody2D robot;
 
     // Movement params
@@ -167,7 +164,7 @@ public class CharacterController2D : MonoBehaviour
 
                 foreach (RaycastHit2D hit in hits)
                 {
-                    if (hit.collider.gameObject != this.gameObject)
+                    if (hit.collider.gameObject != this.gameObject && hit.collider.GetComponent<RobotPartPhysics>() == null)
                     {
                         // first hit other than me
                         
@@ -360,21 +357,31 @@ public class CharacterController2D : MonoBehaviour
     public void LaserHit(float laserPower)
     {
         int pointsLost = Mathf.CeilToInt(laserPower);
+
+        if (hitpoints > 0)
+        {
+            for (int i = 0; i < pointsLost; i++)
+            {
+                GameObject robotPart = Instantiate(partPrefab, GameLogic.instance.playerParentTransform);
+                robotPart.transform.position = transform.position;
+                SpriteRenderer sr = robotPart.GetComponent<SpriteRenderer>();
+                sr.sprite = partSprites[Random.Range(0, partSprites.Count)];
+                sr.material.SetTexture("_SwapTex", colorSwapTex);
+                robotPart.GetComponent<RobotPartPhysics>().playerID = this.playerID;
+            }
+        }
+
         hitpoints -= pointsLost;
 
         if (hitpoints < 0)
             hitpoints = 0;
 
         myHPBar.UpdateHP(hitpoints);
-
-        //todo spawn parts
-        GameObject robotPart = Instantiate(partPrefab, partParentTransform);
-        robotPart.GetComponent<RobotPartPhysics>().playerID = this.playerID;
     }
 
-    public void Heal()
+    public void Heal(int amount = 1)
     {
-        hitpoints++;
+        hitpoints += amount;
         if (hitpoints > MAX_HP)
             hitpoints = MAX_HP;
         myHPBar.UpdateHP(hitpoints);
@@ -388,7 +395,8 @@ public class CharacterController2D : MonoBehaviour
             if (capturedPlayer != null)
             {
                 capturedPlayer.gameObject.SetActive(true);
-                capturedPlayer.transform.position = transform.position + new Vector3(Random.Range(-1, 1), Random.Range(-1, 1), 0);
+                capturedPlayer.transform.position = transform.position + new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0);
+                capturedPlayer.Heal(8);
             }
         }
 
