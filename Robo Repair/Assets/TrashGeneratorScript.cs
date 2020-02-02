@@ -2,10 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: ADD DIFFERENT SPAWN RATES FOR DIFFERENT TYPES OF TRASH, ADD A NEW CATEGORY FOR SMALL TRASH, PREVENT OBJECTS FROM SPAWNING NEAR WALLS
 public class TrashGeneratorScript : MonoBehaviour
 {
     [SerializeField] Transform top, bottom, left, right;
-    [SerializeField] GameObject myPrefab;
+    [SerializeField] GameObject[] myPrefab;
+    [SerializeField] SpriteRenderer trashSpriteRenderer;
+    [SerializeField] Sprite[] trashSprites;
+    [SerializeField] SpriteRenderer canSpriteRenderer;
+    [SerializeField] Sprite[] canSprites;
+    [SerializeField] SpriteRenderer bananaSpriteRenderer;
+    [SerializeField] Sprite[] bananaSprites;
 
     // Start is called before the first frame update
     void Start()
@@ -24,7 +31,15 @@ public class TrashGeneratorScript : MonoBehaviour
         placedObjects[0] = toReturn;
         // Increment n to decrease clumping
         placedPoints++;
-        Instantiate(myPrefab, new Vector3(toReturn.x, toReturn.y, 0), Quaternion.identity);
+        int generateRandObj = Random.Range(0, myPrefab.Length);
+        Instantiate(myPrefab[generateRandObj], new Vector3(toReturn.x, toReturn.y, 0), Quaternion.identity);
+        // Trash
+        // Do stuff with sprites
+        if (generateRandObj == 0) { trashSpriteRenderer.sprite = trashSprites[Random.Range(0, trashSprites.Length)]; }
+        // Cans
+        else if (generateRandObj == 1) { canSpriteRenderer.sprite = canSprites[Random.Range(0, canSprites.Length)]; }
+        // Banana
+        else if (generateRandObj == 2) { bananaSpriteRenderer.sprite = bananaSprites[Random.Range(0, bananaSprites.Length)]; }
 
         Vector3 currVector;
         Vector3 diff;
@@ -69,7 +84,17 @@ public class TrashGeneratorScript : MonoBehaviour
             placedObjects[l] = toReturn;
             // Increment n to decrease clumping
             placedPoints++;
-            Instantiate(myPrefab, new Vector3(toReturn.x, toReturn.y, 0), Quaternion.identity);
+            //Instantiate(myPrefab, new Vector3(toReturn.x, toReturn.y, 0), Quaternion.identity);
+
+            generateRandObj = Random.Range(0, myPrefab.Length);
+            Instantiate(myPrefab[generateRandObj], new Vector3(toReturn.x, toReturn.y, 0), Quaternion.identity);
+            // Trash
+            // Do stuff with sprites
+            if (generateRandObj == 0) { trashSpriteRenderer.sprite = trashSprites[Random.Range(0, trashSprites.Length)]; }
+            // Cans
+            else if (generateRandObj == 1) { canSpriteRenderer.sprite = canSprites[Random.Range(0, canSprites.Length)]; }
+            // Banana
+            else if (generateRandObj == 2) { bananaSpriteRenderer.sprite = bananaSprites[Random.Range(0, bananaSprites.Length)]; }
         }
 
         //for (int i = 0; i < (Random.Range(20, 40)); i++)

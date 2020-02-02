@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1693492816369376057
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1693492816369376056}
+  - component: {fileID: 1693492816369376059}
+  m_Layer: 0
+  m_Name: TrashGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1693492816369376056
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1693492816369376057}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1693492816369376059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1693492816369376057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ca26a6d870cc7349a20c195ddd1935c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  top: {fileID: 0}
+  bottom: {fileID: 0}
+  left: {fileID: 0}
+  right: {fileID: 0}
+  myPrefab:
+  - {fileID: 2405391955370722358, guid: d7e10217ad0dfb74eb00ae458bc7a25d, type: 3}
+  - {fileID: 2405391955370722358, guid: 6b51d9af29db14b43af8c638021016f9, type: 3}
+  - {fileID: 2405391955370722358, guid: 484f659bc28bb8d4fa7e1fc3bbdb6dec, type: 3}
+  trashSpriteRenderer: {fileID: 7632937967713978460, guid: d7e10217ad0dfb74eb00ae458bc7a25d,
+    type: 3}
+  trashSprites:
+  - {fileID: -562605217060080129, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  - {fileID: -4970410492042351176, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  - {fileID: -5930158604282628446, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  canSpriteRenderer: {fileID: 7632937967713978460, guid: 6b51d9af29db14b43af8c638021016f9,
+    type: 3}
+  canSprites:
+  - {fileID: -4233739483619845583, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  - {fileID: -6551456632857933372, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  - {fileID: 4717279005209572468, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  - {fileID: -232304020389510235, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  - {fileID: -2542073858232844238, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  - {fileID: 4362130248060910229, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  - {fileID: 5331757720867617967, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  - {fileID: 5743168839956448968, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  bananaSpriteRenderer: {fileID: 7632937967713978460, guid: 484f659bc28bb8d4fa7e1fc3bbdb6dec,
+    type: 3}
+  bananaSprites:
+  - {fileID: 3912554482014063563, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  - {fileID: -5970157769536964832, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
+  - {fileID: 289909530908896649, guid: 66144235fce633c4788bb9693e34ae59, type: 3}
